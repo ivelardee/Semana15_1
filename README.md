@@ -19,7 +19,7 @@ La clave se utiliza para crear el administrador inicial; no cambia la contraseñ
 cd backend
 .\mvnw.cmd clean package
 docker build -t adopciones-backend .
-cd ..\frontend
+cd frontend
 npm ci
 npm run build
 docker build -t adopciones-frontend .
