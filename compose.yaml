@@ -1,0 +1,21 @@
+services:
+  backend:
+    image: adopciones-backend:latest
+    environment:
+      APP_ADMIN_PASSWORD: ${APP_ADMIN_PASSWORD:?Define APP_ADMIN_PASSWORD en un archivo .env local}
+    ports:
+      - "8080:8080"
+    volumes:
+      - datos_h2:/app/data
+
+  frontend:
+    image: adopciones-frontend:latest
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+
+volumes:
+  datos_h2:
+    external: true
+    name: adopciones-datos

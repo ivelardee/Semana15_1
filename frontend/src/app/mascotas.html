@@ -1,0 +1,198 @@
+@if (vm.cargando()) {
+  <p role="status">Cargando mascotas…</p>
+}
+
+<main>
+  <section class="titulo">
+    <div>
+      <div class="etiqueta">PANEL DE ADMINISTRACIÓN</div>
+      <h1>Un hogar para cada historia</h1>
+      <p>Cuida sus datos. Acércalos a una familia.</p>
+    </div>
+    <button (click)="vm.abrir()">+ Registrar mascota</button>
+  </section>
+  <section class="estadisticas">
+    <div>
+      <strong>{{ vm.mascotas().length }}</strong><span>Mascotas registradas</span>
+    </div>
+    <div>
+      <strong>{{ vm.disponibles() }}</strong><span>Esperando un hogar</span>
+    </div>
+    <div>
+      <strong>{{ vm.mascotas().length - vm.disponibles() }}</strong><span
+        >En proceso o adoptadas</span
+      >
+    </div>
+  </section>
+  @if (vm.aviso()) {
+    <p class="exito" role="status">{{ vm.aviso() }}</p>
+  }
+  @if (vm.error() && !vm.editor()) {
+    <p class="error" role="alert">{{ vm.error() }}</p>
+  }
+  <section class="herramientas">
+    <label
+      >Buscar mascota<input
+        [(ngModel)]="vm.buscar"
+        placeholder="Nombre, código, especie o raza" /></label
+    ><label
+      >Estado<select [(ngModel)]="vm.filtro">
+        <option value="">Todos los estados</option>
+        <option value="DISPONIBLE">Disponible</option>
+        <option value="EN_PROCESO">En proceso</option>
+        <option value="ADOPTADA">Adoptada</option>
+      </select></label
+    >
+  </section>
+  <section class="tarjetas">
+    @for (m of vm.visibles(); track m.id) {
+      <article>
+        <div class="retrato" [class.gato]="m.especie === 'GATO'">
+          <span aria-hidden="true">{{ vm.icono(m.especie) }}</span><span class="estado">{{
+            vm.etiqueta(m.estado)
+          }}</span>
+        </div>
+        <div class="contenido">
+          <small>{{ m.codigo }} · {{ m.especie }}</small>
+          <h2>{{ m.nombre }}</h2>
+          <p>
+            {{ m.raza || 'Sin raza especificada' }} · {{ m.edadMeses }} meses<br />{{ m.sexo }} ·
+            {{ m.tamanio }}
+          </p>
+          <p>{{ m.descripcion || 'Sin descripción.' }}</p>
+          <div class="salud">
+            <span>{{ m.vacunada ? '✓ Vacunada' : 'Vacunación pendiente' }}</span><span>{{
+              m.esterilizada ? '✓ Esterilizada' : 'Sin esterilizar'
+            }}</span>
+          </div>
+          <div class="acciones">
+            <button class="secundario" (click)="vm.abrir(m)">Editar</button
+            ><button class="peligro" (click)="vm.eliminando.set(m)">Eliminar</button>
+          </div>
+        </div>
+      </article>
+    } @empty {
+      <p class="vacio">No hay mascotas para mostrar. Registra una mascota o cambia tu búsqueda.</p>
+    }
+  </section>
+</main>
+@if (vm.editor()) {
+  <div class="fondo">
+    <section class="modal" role="dialog" aria-modal="true" aria-labelledby="tituloFormulario">
+      <h2 id="tituloFormulario">{{ vm.formulario.id ? 'Editar mascota' : 'Registrar mascota' }}</h2>
+      <form (ngSubmit)="vm.guardar()" #f="ngForm">
+        <div class="campos">
+          <label
+            >Código<input
+              name="codigo"
+              [(ngModel)]="vm.formulario.codigo"
+              required
+              maxlength="40"
+              pattern=".*\S.*" /></label
+          ><label
+            >Nombre<input
+              name="nombre"
+              [(ngModel)]="vm.formulario.nombre"
+              required
+              maxlength="80"
+              pattern=".*\S.*"
+          /></label>
+          <label
+            >Especie<select name="especie" [(ngModel)]="vm.formulario.especie">
+              <option>PERRO</option>
+              <option>GATO</option>
+              <option>CONEJO</option>
+              <option>OTRO</option>
+            </select></label
+          ><label>Raza<input name="raza" [(ngModel)]="vm.formulario.raza" maxlength="100" /></label>
+          <label
+            >Edad en meses<input
+              name="edad"
+              type="number"
+              [(ngModel)]="vm.formulario.edadMeses"
+              required
+              min="0"
+              max="600"
+              step="1" /></label
+          ><label
+            >Sexo<select name="sexo" [(ngModel)]="vm.formulario.sexo">
+              <option>HEMBRA</option>
+              <option>MACHO</option>
+            </select></label
+          >
+          <label
+            >Tamaño<select name="tamanio" [(ngModel)]="vm.formulario.tamanio">
+              <option>PEQUEÑO</option>
+              <option>MEDIANO</option>
+              <option>GRANDE</option>
+            </select></label
+          ><label
+            >Estado<select name="estado" [(ngModel)]="vm.formulario.estado">
+              <option value="DISPONIBLE">Disponible</option>
+              <option value="EN_PROCESO">En proceso</option>
+              <option value="ADOPTADA">Adoptada</option>
+            </select></label
+          >
+          <label class="ancho"
+            >Descripción<textarea
+              name="descripcion"
+              [(ngModel)]="vm.formulario.descripcion"
+              maxlength="1000"
+              rows="3"
+            ></textarea></label
+          ><label class="check"
+            ><input
+              name="vacunada"
+              type="checkbox"
+              [(ngModel)]="vm.formulario.vacunada"
+            />Vacunada</label
+          ><label class="check"
+            ><input
+              name="esterilizada"
+              type="checkbox"
+              [(ngModel)]="vm.formulario.esterilizada"
+            />Esterilizada</label
+          >
+        </div>
+        @if (vm.error()) {
+          <p class="error" role="alert">{{ vm.error() }}</p>
+        }
+        <div class="pie">
+          <button
+            type="button"
+            class="secundario"
+            (click)="vm.editor.set(false)"
+            [disabled]="vm.ocupado()"
+          >
+            Cancelar</button
+          ><button [disabled]="f.invalid || vm.ocupado()">
+            {{ vm.ocupado() ? 'Guardando…' : 'Guardar mascota' }}
+          </button>
+        </div>
+      </form>
+    </section>
+  </div>
+}
+@if (vm.eliminando(); as m) {
+  <div class="fondo">
+    <section
+      class="modal confirmar"
+      role="alertdialog"
+      aria-modal="true"
+      aria-labelledby="confirmar"
+    >
+      <h2 id="confirmar">¿Eliminar a {{ m.nombre }}?</h2>
+      <p>Se eliminará su registro. Esta acción no se puede deshacer.</p>
+      @if (vm.error()) {
+        <p class="error" role="alert">{{ vm.error() }}</p>
+      }
+      <div class="pie">
+        <button class="secundario" (click)="vm.eliminando.set(null)" [disabled]="vm.ocupado()">
+          Cancelar</button
+        ><button class="borrar" (click)="vm.eliminar()" [disabled]="vm.ocupado()">
+          {{ vm.ocupado() ? 'Eliminando…' : 'Sí, eliminar' }}
+        </button>
+      </div>
+    </section>
+  </div>
+}

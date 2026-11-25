@@ -1,0 +1,32 @@
+<main class="acceso">
+  <section class="bienvenida">
+    <div class="etiqueta">ADOPCIÓN RESPONSABLE</div>
+    <h1>Cada mascota merece<br />un hogar lleno de amor.</h1>
+    <p>Gestiona su cuidado y acompaña el camino hacia su nueva familia.</p>
+    <div class="animales"></div>
+  </section>
+  <form class="login" (ngSubmit)="vm.ingresar()">
+    <h2>Bienvenido</h2>
+    <p>Ingresa para gestionar las mascotas.</p>
+    <label
+      >Usuario<input
+        name="username"
+        [(ngModel)]="vm.username"
+        required
+        autocomplete="username"
+        placeholder="Tu usuario" /></label
+    ><label
+      >Contraseña<input
+        name="password"
+        type="password"
+        [(ngModel)]="vm.password"
+        required
+        autocomplete="current-password"
+        placeholder="Tu contraseña"
+    /></label>
+    @if (vm.error()) {
+      <p class="error" role="alert">{{ vm.error() }}</p>
+    }
+    <button [disabled]="vm.ocupado()">{{ vm.ocupado() ? 'Ingresando…' : 'Iniciar sesión' }}</button>
+  </form>
+</main>

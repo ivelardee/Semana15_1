@@ -1,0 +1,16 @@
+<header>
+  <a class="marca" routerLink="/">🐾 Adopta<span>Un nuevo comienzo</span></a>
+  @if (vm.usuario()) {
+    <div class="sesion">
+      <span>{{ vm.usuario() }}</span><button
+        class="secundario"
+        (click)="vm.salir()"
+        [disabled]="vm.ocupado()"
+      >
+        Cerrar sesión
+      </button>
+    </div>
+  }
+</header>
+<router-outlet></router-outlet>
+<footer>Adopta · Pequeños cuidados, grandes historias.</footer>
